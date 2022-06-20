@@ -1,11 +1,10 @@
-import imp
 import sys
-from traceback import print_tb
 import pygame
 
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from aline import Alien
 
 
 class AlienInvasion:
@@ -25,7 +24,9 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
 
+        self._create_fleet()
         # Set the background color
         self.bg_color = (self.settings.bg_color)
 
@@ -90,8 +91,15 @@ class AlienInvasion:
 
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
         # Make the most recent drawn screen visisble.
         pygame.display.flip()
+
+    def _create_fleet(self):
+        """Create the fleet of the alien"""
+        # Make an alien
+        alien = Alien(self)
+        self.aliens.add(alien)
 
 
 if __name__ == '__main__':
