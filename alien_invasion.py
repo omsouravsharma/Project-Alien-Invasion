@@ -1,4 +1,7 @@
+from cmath import rect
 import sys
+from turtle import left, right
+from wsgiref.util import shift_path_info
 import pygame
 
 from settings import Settings
@@ -37,6 +40,7 @@ class AlienInvasion:
             self.ship.update()
             self.bullets.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
 
     def _check_events(self):
@@ -100,6 +104,58 @@ class AlienInvasion:
         # Make an alien
         alien = Alien(self)
         self.aliens.add(alien)
+
+    def _create_fleet(self):
+        """Create the fleet of the aliens"""
+        # Create the aliens and find the number of aliends in the rows
+        # Spacing between alien is equal to one alien width
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+
+        # alien_width = alien.rect.width
+        available_space_x = self.settings.screen_width - (2*alien_width)
+        number_alines_x = available_space_x // (2*alien_width)
+
+        # Determine the number of rows of alien tht fit on the screen
+        ship_height = self.ship.rect.height
+        available_space_y = (self.settings.screen_height -
+                             (3*alien_height) - ship_height)
+        number_rows = available_space_y // (2*alien_height)
+
+        # Create the full fleet of aliens
+
+        # Create the first rows of aliens
+        for row_number in range(number_rows):
+            # Create an alien and palce it in the row
+            for alien_number in range(number_alines_x):
+                self._create_alien(alien_number, row_number)
+
+    def _create_alien(self, alien_number, row_number):
+        """create an alien and place it in the row"""
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
+        self.aliens.add(alien)
+
+    def _update_aliens(self):
+        """Update the position of all the aliens in the fleet."""
+        self._check_fleet_edges()
+        self.aliens.update()
+
+    def _check_fleet_edges(self):
+        """Respond appropriateely if any aliens have reached an edges"""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """Drop the entire fleet and change the fleet's direction"""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
 
 
 if __name__ == '__main__':
