@@ -1,3 +1,4 @@
+from telnetlib import SE
 import pygame
 
 
@@ -38,3 +39,8 @@ class Ship:
     def blitme(self):
         """Draw the ship at the current location"""
         self.screen.blit(self.image, self.rect)
+
+    def center_ship(self):
+        """Center the ship on thr screen"""
+        self.rect.midbottom = self.screen_rect.midbottom
+        self.x = float(self.rect.x)
